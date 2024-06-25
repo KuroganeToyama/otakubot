@@ -1,0 +1,20 @@
+{
+  "name": "otakubot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "local:run": "node deploy-commands.js && node .",
+    "image:build": "docker build . -t otaku",
+    "clean": "docker compose down",
+    "stop": "docker compose stop",
+    "start": "docker compose up -d",
+    "restart": "docker compose restart",
+    "logs": "docker logs -f otaku-bot",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5"
+  }
+}

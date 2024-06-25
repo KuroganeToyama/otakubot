@@ -1,0 +1,8 @@
+services:
+  otaku-bot:
+    image: otaku:latest
+    container_name: otaku-bot
+    env_file:
+      - .env
+    environment:
+      - CHOKIDAR_USEPOLLING=true
