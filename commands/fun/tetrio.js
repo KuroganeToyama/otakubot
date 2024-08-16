@@ -28,7 +28,7 @@ module.exports = {
         .addSubcommand(subcommand =>
             subcommand
                 .setName('chart')
-                .setDescription('Get a chart on TETRIO profiles on al users in this server')
+                .setDescription('Get a chart on TETRIO profiles on all users in this server')
                 .addStringOption(option =>
                     option
                         .setName('param')
