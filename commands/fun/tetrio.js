@@ -67,11 +67,11 @@ module.exports = {
 
             if (success === true) {
                 const exp = Math.round(json.data.xp);
-                const gamesPlayed = json.data.gamesplayed;
-                const gamesWon = json.data.gameswon;
-                const winRate = ((json.data.gameswon / json.data.gamesplayed) * 100).toPrecision(2);
+                const gamesPlayed = (json.data.gamesplayed === -1) ? 0 : json.data.gamesplayed;
+                const gamesWon = (json.data.gameswon === -1) ? 0 : json.data.gameswon;
+                const winRate = (json.data.gamesplayed === -1) ? 0 : ((json.data.gameswon / json.data.gamesplayed) * 100).toPrecision(2);
                 const ar = json.data.ar;
-                const gameTime = Math.round(json.data.gametime / 3600);
+                const gameTime = (json.data.gametime === -1) ? 0 : Math.round(json.data.gametime / 3600);
 
                 const embed = new EmbedBuilder()
                         .setColor('Green')
