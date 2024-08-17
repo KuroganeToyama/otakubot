@@ -197,8 +197,7 @@ module.exports = {
                     const responseBlitz = await fetch(apiCallBlitz);
                     const jsonBlitz = await responseBlitz.json();
 
-                    const finalScore = jsonBlitz.data.record.results.stats.score;
-                    data = finalScore.toLocaleString('en-US');
+                    data = jsonBlitz.data.record.results.stats.score;
                 }
 
                 else if (param === 'QP All Time') {
@@ -288,11 +287,13 @@ module.exports = {
                     const apiCallTL = apiCallUser + '/' + summaryEndpoint + tetraleagueEndpoint;
                     const responseTL = await fetch(apiCallTL);
                     const jsonTL = await responseTL.json();
-                    data = (jsonTL.data.tr === -1) ? 0 : Math.round(jsonTL.data.tr).toLocaleString('en-US');
+                    data = (jsonTL.data.tr === -1) ? 0 : Math.round(jsonTL.data.tr);
                 }
 
                 dict[tetrioUser] = data;
             }
+
+            console.log(dict);
 
             const sortedArr = Object.entries(dict).sort(([, valueA], [, valueB]) => valueA - valueB);
             const sortedDict = Object.fromEntries(sortedArr);
