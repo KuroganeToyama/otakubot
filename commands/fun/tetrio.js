@@ -36,11 +36,21 @@ module.exports = {
                         .setRequired(true)
                         .addChoices(
                             { name: 'EXP', value: 'EXP' },
+                            { name: 'AR', value: 'AR' },
+                            { name: 'Game Time', value: 'Game Time' },
+                            { name: '40L', value: '40L' },
+                            { name: 'Blitz', value: 'Blitz' },
+                            { name: 'QP All Time', value: 'QP All Time' },
+                            { name: 'QP This Week', value: 'QP This Week' },
+                            { name: 'Expert QP All Time', value: 'Expert QP All Time' },
+                            { name: 'Expert QP This Week', value: 'Expert QP This Week' },
                             { name: 'Games Played', value: 'Games Played' },
                             { name: 'Games Won', value: 'Games Won' },
                             { name: 'Win Rate', value: 'Win Rate' },
-                            { name: 'AR', value: 'AR' },
-                            { name: 'Game Time', value: 'Game Time' },
+                            { name: 'APM', value: 'APM' },
+                            { name: 'PPS', value: 'PPS' },
+                            { name: 'VS', value: 'VS' },
+                            { name: 'TR', value: 'TR' },
                         ))
         ),
     
@@ -67,9 +77,6 @@ module.exports = {
             const jsonUser = await responseUser.json();
 
             const exp = Math.round(jsonUser.data.xp).toLocaleString('en-US');
-            // const gamesPlayed = (jsonUser.data.gamesplayed === -1) ? 0 : jsonUser.data.gamesplayed;
-            // const gamesWon = (jsonUser.data.gameswon === -1) ? 0 : jsonUser.data.gameswon;
-            // const winRate = (jsonUser.data.gamesplayed === -1) ? 0 : ((jsonUser.data.gameswon / jsonUser.data.gamesplayed) * 100).toPrecision(2);
             const ar = jsonUser.data.ar;
             const gameTime = (jsonUser.data.gametime === -1) ? 0 : Math.round(jsonUser.data.gametime / 3600);
 
@@ -116,7 +123,7 @@ module.exports = {
             const apm = (jsonTL.data.apm === null) ? 0 : jsonTL.data.apm;
             const pps = (jsonTL.data.pps === null) ? 0: jsonTL.data.pps;
             const vs = (jsonTL.data.vs === null) ? 0: jsonTL.data.vs;
-            const tr = (jsonTL.data.tr === -1) ? 'None' : Math.round(jsonTL.data.tr).toLocaleString('en-US');
+            const tr = (jsonTL.data.tr === -1) ? 0 : Math.round(jsonTL.data.tr).toLocaleString('en-US');
             const rank = (jsonTL.data.rank === 'z') ? 'None' : jsonTL.data.rank.toUpperCase();
 
             // Final embed
@@ -159,33 +166,129 @@ module.exports = {
 
             for (const discordUser in discordToTETRIO) {
                 const tetrioUser = discordToTETRIO[discordUser];
-                const apiCall = tetrioAPI + userEndpoint + tetrioUser;
-                const response = await fetch(apiCall);
-                const json = await response.json();
 
                 let data = '';
+                const apiCallUser = tetrioAPI + userEndpoint + tetrioUser;
                 if (param === 'EXP') {
+                    const apiCall = tetrioAPI + userEndpoint + tetrioUser;
+                    const response = await fetch(apiCall);
+                    const json = await response.json();
                     data = Math.round(json.data.xp);
                 }
-                else if (param === 'Games Played') {
-                    data = (json.data.gamesplayed === -1) ? 0 : json.data.gamesplayed;
-                }
-                else if (param === 'Games Won') {
-                    data = (json.data.gameswon === -1) ? 0 : json.data.gameswon;
-                }
-                else if (param === 'Win Rate') {
-                    if (json.data.gamesplayed === -1) {
-                        data = 0;
-                    }
-                    else {
-                        data = ((json.data.gameswon / json.data.gamesplayed) * 100).toPrecision(2);
-                    }
-                }
+
                 else if (param === 'AR') {
+                    const apiCall = tetrioAPI + userEndpoint + tetrioUser;
+                    const response = await fetch(apiCall);
+                    const json = await response.json();
                     data = json.data.ar;
                 }
+
+                else if (param === '40L') {
+                    const apiCall40L = apiCallUser + '/' + summaryEndpoint + fortylineEndpoint;
+                    const response40L = await fetch(apiCall40L);
+                    const json40L = await response40L.json();
+
+                    const finalTime = (json40L.data.record.results.stats.finaltime) / 1000;
+                    data = finalTime.toFixed(3);
+                }
+
+                else if (param === 'Blitz') {
+                    const apiCallBlitz = apiCallUser + '/' + summaryEndpoint + blitzEndpoint;
+                    const responseBlitz = await fetch(apiCallBlitz);
+                    const jsonBlitz = await responseBlitz.json();
+
+                    const finalScore = jsonBlitz.data.record.results.stats.score;
+                    data = finalScore.toLocaleString('en-US');
+                }
+
+                else if (param === 'QP All Time') {
+                    const apiCallQP = apiCallUser + '/' + summaryEndpoint + quickplayEndpoint;
+                    const responseQP = await fetch(apiCallQP);
+                    const jsonQP = await responseQP.json();
+
+                    data = (jsonQP.data.best.record === null) ? 0 : jsonQP.data.best.record.results.stats.zenith.altitude.toFixed(1);
+                }
+
+                else if (param === 'QP This Week') {
+                    const apiCallQP = apiCallUser + '/' + summaryEndpoint + quickplayEndpoint;
+                    const responseQP = await fetch(apiCallQP);
+                    const jsonQP = await responseQP.json();
+
+                    data = (jsonQP.data.record === null) ? 0 : jsonQP.data.record.results.stats.zenith.altitude.toFixed(1);
+                }
+
+                else if (param === 'Expert QP All Time') {
+                    const apiCallQPEx = apiCallUser + '/' + summaryEndpoint + expertqpEndpoint;
+                    const responseQPEx = await fetch(apiCallQPEx);
+                    const jsonQPEx = await responseQPEx.json();
+
+                    data = (jsonQPEx.data.best.record === null) ? 0 : jsonQPEx.data.best.record.results.stats.zenith.altitude.toFixed(1);
+                }
+
+                else if (param === 'Expert QP This Week') {
+                    const apiCallQPEx = apiCallUser + '/' + summaryEndpoint + expertqpEndpoint;
+                    const responseQPEx = await fetch(apiCallQPEx);
+                    const jsonQPEx = await responseQPEx.json();
+
+                    data = (jsonQPEx.data.record === null) ? 0 : jsonQPEx.data.record.results.stats.zenith.altitude.toFixed(1);
+                }
+
                 else if (param === 'Game Time') {
+                    const apiCall = tetrioAPI + userEndpoint + tetrioUser;
+                    const response = await fetch(apiCall);
+                    const json = await response.json();
                     data = (json.data.gametime === -1) ? 0 : Math.round(json.data.gametime / 3600);
+                }
+
+                else if (param === 'Games Played') {
+                    const apiCallTL = apiCallUser + '/' + summaryEndpoint + tetraleagueEndpoint;
+                    const responseTL = await fetch(apiCallTL);
+                    const jsonTL = await responseTL.json();
+                    data = jsonTL.data.gamesplayed;
+                }
+
+                else if (param === 'Games Won') {
+                    const apiCallTL = apiCallUser + '/' + summaryEndpoint + tetraleagueEndpoint;
+                    const responseTL = await fetch(apiCallTL);
+                    const jsonTL = await responseTL.json();
+                    data = jsonTL.data.gameswon;
+                }
+
+                else if (param === 'Win Rate') {
+                    const apiCallTL = apiCallUser + '/' + summaryEndpoint + tetraleagueEndpoint;
+                    const responseTL = await fetch(apiCallTL);
+                    const jsonTL = await responseTL.json();
+                    const gamesPlayed = jsonTL.data.gamesplayed;
+                    const gamesWon = jsonTL.data.gameswon;
+                    data = (gamesPlayed === 0) ? 0 : ((gamesWon / gamesPlayed) * 100).toFixed(2);
+                }
+
+                else if (param === 'APM') {
+                    const apiCallTL = apiCallUser + '/' + summaryEndpoint + tetraleagueEndpoint;
+                    const responseTL = await fetch(apiCallTL);
+                    const jsonTL = await responseTL.json();
+                    data = (jsonTL.data.apm === null) ? 0 : jsonTL.data.apm;
+                }
+
+                else if (param === 'PPS') {
+                    const apiCallTL = apiCallUser + '/' + summaryEndpoint + tetraleagueEndpoint;
+                    const responseTL = await fetch(apiCallTL);
+                    const jsonTL = await responseTL.json();
+                    data = (jsonTL.data.pps === null) ? 0: jsonTL.data.pps;
+                }
+
+                else if (param === 'VS') {
+                    const apiCallTL = apiCallUser + '/' + summaryEndpoint + tetraleagueEndpoint;
+                    const responseTL = await fetch(apiCallTL);
+                    const jsonTL = await responseTL.json();
+                    data = (jsonTL.data.vs === null) ? 0: jsonTL.data.vs;
+                }
+
+                else if (param === 'TR') {
+                    const apiCallTL = apiCallUser + '/' + summaryEndpoint + tetraleagueEndpoint;
+                    const responseTL = await fetch(apiCallTL);
+                    const jsonTL = await responseTL.json();
+                    data = (jsonTL.data.tr === -1) ? 0 : Math.round(jsonTL.data.tr).toLocaleString('en-US');
                 }
 
                 dict[tetrioUser] = data;
