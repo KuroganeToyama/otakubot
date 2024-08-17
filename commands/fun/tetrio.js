@@ -4,6 +4,8 @@ const discordToTETRIO = require('../../tetrio.json');
 
 const tetrioAPI = 'https://ch.tetr.io/api/';
 const userEndpoint = 'users/';
+const summaryEndpoint = 'summaries/';
+const fortylineEndpoint = '40l';
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -54,40 +56,43 @@ module.exports = {
             }
 
             const tetrioUser = discordToTETRIO[user];
-            const apiCall = tetrioAPI + userEndpoint + tetrioUser;
-            const response = await fetch(apiCall);
-            const json = await response.json();
-            const success = json.success;
 
-            if (success === true) {
-                const exp = Math.round(json.data.xp);
-                const gamesPlayed = (json.data.gamesplayed === -1) ? 0 : json.data.gamesplayed;
-                const gamesWon = (json.data.gameswon === -1) ? 0 : json.data.gameswon;
-                const winRate = (json.data.gamesplayed === -1) ? 0 : ((json.data.gameswon / json.data.gamesplayed) * 100).toPrecision(2);
-                const ar = json.data.ar;
-                const gameTime = (json.data.gametime === -1) ? 0 : Math.round(json.data.gametime / 3600);
+            // General data
+            const apiCallUser = tetrioAPI + userEndpoint + tetrioUser;
+            const responseUser = await fetch(apiCallUser);
+            const jsonUser = await responseUser.json();
 
-                const embed = new EmbedBuilder()
-                        .setColor('Green')
-                        .setTitle(`TETRIO profile of ${tetrioUser.toUpperCase()}`)
-                        .addFields(
-                            { name: 'EXP gained', value: `${exp}`, inline: true },
-                            { name: 'AR', value: `${ar}`, inline: true },
-                            { name: 'Game time', value: `${gameTime} hours`, inline: true },
-                            { name: 'Games played', value: `${gamesPlayed}`, inline: true },
-                            { name: 'Games won', value: `${gamesWon}`, inline: true },
-                            { name: 'Win rate', value: `${winRate}%`, inline: true },
-                        );
+            const exp = Math.round(jsonUser.data.xp);
+            const gamesPlayed = (jsonUser.data.gamesplayed === -1) ? 0 : jsonUser.data.gamesplayed;
+            const gamesWon = (jsonUser.data.gameswon === -1) ? 0 : jsonUser.data.gameswon;
+            const winRate = (jsonUser.data.gamesplayed === -1) ? 0 : ((jsonUser.data.gameswon / jsonUser.data.gamesplayed) * 100).toPrecision(2);
+            const ar = jsonUser.data.ar;
+            const gameTime = (jsonUser.data.gametime === -1) ? 0 : Math.round(jsonUser.data.gametime / 3600);
 
-                await interaction.editReply({embeds: [embed]});
-                return;
-            }
+            // 40 Lines data
+            const apiCall40L = apiCallUser + '/' + summaryEndpoint + fortylineEndpoint;
+            console.log(apiCall40L);
+            const response40L = await fetch(apiCall40L);
+            const json40L = await response40L.json();
 
-            const errorEmbed = new EmbedBuilder()
-                    .setColor('Red')
-                    .setDescription('User not found in TETRIO database.');
-            
-            await interaction.editReply({embeds: [errorEmbed]}); 
+            const finaltime = (json40L.data.record.results.stats.finaltime) / 1000;
+            const fortylinetime = finaltime.toFixed(3);
+
+            // Final embed
+            const embed = new EmbedBuilder()
+                    .setColor('Green')
+                    .setTitle(`TETRIO profile of ${tetrioUser.toUpperCase()}`)
+                    .addFields(
+                        { name: 'EXP gained', value: `${exp}`, inline: true },
+                        { name: 'AR', value: `${ar}`, inline: true },
+                        { name: 'Game time', value: `${gameTime} hours`, inline: true },
+                        { name: 'Games played', value: `${gamesPlayed}`, inline: true },
+                        { name: 'Games won', value: `${gamesWon}`, inline: true },
+                        { name: 'Win rate', value: `${winRate}%`, inline: true },
+                        { name: '40L PB', value: `${fortylinetime} secs`, inline: true },
+                    );
+
+            await interaction.editReply({embeds: [embed]});
             return;
         }
 
