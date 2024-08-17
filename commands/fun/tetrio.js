@@ -6,6 +6,7 @@ const tetrioAPI = 'https://ch.tetr.io/api/';
 const userEndpoint = 'users/';
 const summaryEndpoint = 'summaries/';
 const fortylineEndpoint = '40l';
+const blitzEndpoint = 'blitz';
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -62,7 +63,7 @@ module.exports = {
             const responseUser = await fetch(apiCallUser);
             const jsonUser = await responseUser.json();
 
-            const exp = Math.round(jsonUser.data.xp);
+            const exp = Math.round(jsonUser.data.xp).toLocaleString('en-US');
             const gamesPlayed = (jsonUser.data.gamesplayed === -1) ? 0 : jsonUser.data.gamesplayed;
             const gamesWon = (jsonUser.data.gameswon === -1) ? 0 : jsonUser.data.gameswon;
             const winRate = (jsonUser.data.gamesplayed === -1) ? 0 : ((jsonUser.data.gameswon / jsonUser.data.gamesplayed) * 100).toPrecision(2);
@@ -71,12 +72,19 @@ module.exports = {
 
             // 40 Lines data
             const apiCall40L = apiCallUser + '/' + summaryEndpoint + fortylineEndpoint;
-            console.log(apiCall40L);
             const response40L = await fetch(apiCall40L);
             const json40L = await response40L.json();
 
-            const finaltime = (json40L.data.record.results.stats.finaltime) / 1000;
-            const fortylinetime = finaltime.toFixed(3);
+            const finalTime = (json40L.data.record.results.stats.finaltime) / 1000;
+            const fortylineTime = finalTime.toFixed(3);
+
+            // Blitz data
+            const apiCallBlitz = apiCallUser + '/' + summaryEndpoint + blitzEndpoint;
+            const responseBlitz = await fetch(apiCallBlitz);
+            const jsonBlitz = await responseBlitz.json();
+
+            const finalScore = jsonBlitz.data.record.results.stats.score;
+            const blitzScore = finalScore.toLocaleString('en-US');
 
             // Final embed
             const embed = new EmbedBuilder()
@@ -89,7 +97,8 @@ module.exports = {
                         { name: 'Games played', value: `${gamesPlayed}`, inline: true },
                         { name: 'Games won', value: `${gamesWon}`, inline: true },
                         { name: 'Win rate', value: `${winRate}%`, inline: true },
-                        { name: '40L PB', value: `${fortylinetime} secs`, inline: true },
+                        { name: '40L PB', value: `${fortylineTime} secs`, inline: true },
+                        { name: 'Blitz PB', value: `${blitzScore}`, inline: true },
                     );
 
             await interaction.editReply({embeds: [embed]});
