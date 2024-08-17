@@ -8,6 +8,7 @@ const summaryEndpoint = 'summaries/';
 const fortylineEndpoint = '40l';
 const blitzEndpoint = 'blitz';
 const quickplayEndpoint = 'zenith';
+const expertqpEndpoint = 'zenithex';
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -92,8 +93,16 @@ module.exports = {
             const responseQP = await fetch(apiCallQP);
             const jsonQP = await responseQP.json();
 
-            const quickplayAlltime = jsonQP.data.best.record.results.stats.zenith.altitude.toFixed(1);
+            const quickplayAlltime = (jsonQP.data.best.record === null) ? 0 : jsonQP.data.best.record.results.stats.zenith.altitude.toFixed(1);
             const quickplayWeek = (jsonQP.data.record === null) ? 0 : jsonQP.data.record.results.stats.zenith.altitude.toFixed(1);
+
+            // Expert Quick Play data
+            const apiCallQPEx = apiCallUser + '/' + summaryEndpoint + expertqpEndpoint;
+            const responseQPEx = await fetch(apiCallQPEx);
+            const jsonQPEx = await responseQPEx.json();
+
+            const expertqpAlltime = (jsonQPEx.data.best.record === null) ? 0 : jsonQPEx.data.best.record.results.stats.zenith.altitude.toFixed(1);
+            const expertqpWeek = (jsonQPEx.data.record === null) ? 0 : jsonQPEx.data.record.results.stats.zenith.altitude.toFixed(1);
 
             // Final embed
             const embed = new EmbedBuilder()
@@ -109,8 +118,11 @@ module.exports = {
                         { name: '40L PB', value: `${fortylineTime} secs`, inline: true },
                         { name: 'Blitz PB', value: `${blitzScore}`, inline: true },
                         { name: '\u200b', value: '\u200b', inline: true},
-                        { name: 'All Time QP', value: `${quickplayAlltime}m`, inline: true },
-                        { name: 'This Week QP', value: `${quickplayWeek}m`, inline: true },
+                        { name: 'QP All Time', value: `${quickplayAlltime}m`, inline: true },
+                        { name: 'QP This Week', value: `${quickplayWeek}m`, inline: true },
+                        { name: '\u200b', value: '\u200b', inline: true},
+                        { name: 'Expert QP All Time', value: `${expertqpAlltime}m`, inline: true },
+                        { name: 'Expert QP This Week', value: `${expertqpWeek}m`, inline: true },
                         { name: '\u200b', value: '\u200b', inline: true},
                     );
 
