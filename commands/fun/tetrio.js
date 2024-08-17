@@ -9,6 +9,7 @@ const fortylineEndpoint = '40l';
 const blitzEndpoint = 'blitz';
 const quickplayEndpoint = 'zenith';
 const expertqpEndpoint = 'zenithex';
+const tetraleagueEndpoint = 'league';
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -66,9 +67,9 @@ module.exports = {
             const jsonUser = await responseUser.json();
 
             const exp = Math.round(jsonUser.data.xp).toLocaleString('en-US');
-            const gamesPlayed = (jsonUser.data.gamesplayed === -1) ? 0 : jsonUser.data.gamesplayed;
-            const gamesWon = (jsonUser.data.gameswon === -1) ? 0 : jsonUser.data.gameswon;
-            const winRate = (jsonUser.data.gamesplayed === -1) ? 0 : ((jsonUser.data.gameswon / jsonUser.data.gamesplayed) * 100).toPrecision(2);
+            // const gamesPlayed = (jsonUser.data.gamesplayed === -1) ? 0 : jsonUser.data.gamesplayed;
+            // const gamesWon = (jsonUser.data.gameswon === -1) ? 0 : jsonUser.data.gameswon;
+            // const winRate = (jsonUser.data.gamesplayed === -1) ? 0 : ((jsonUser.data.gameswon / jsonUser.data.gamesplayed) * 100).toPrecision(2);
             const ar = jsonUser.data.ar;
             const gameTime = (jsonUser.data.gametime === -1) ? 0 : Math.round(jsonUser.data.gametime / 3600);
 
@@ -104,6 +105,20 @@ module.exports = {
             const expertqpAlltime = (jsonQPEx.data.best.record === null) ? 0 : jsonQPEx.data.best.record.results.stats.zenith.altitude.toFixed(1);
             const expertqpWeek = (jsonQPEx.data.record === null) ? 0 : jsonQPEx.data.record.results.stats.zenith.altitude.toFixed(1);
 
+            // Tetra League data
+            const apiCallTL = apiCallUser + '/' + summaryEndpoint + tetraleagueEndpoint;
+            const responseTL = await fetch(apiCallTL);
+            const jsonTL = await responseTL.json();
+
+            const gamesPlayed = jsonTL.data.gamesplayed;
+            const gamesWon = jsonTL.data.gameswon;
+            const winRate = (gamesPlayed === 0) ? 0 : ((gamesWon / gamesPlayed) * 100).toFixed(2);
+            const apm = (jsonTL.data.apm === null) ? 0 : jsonTL.data.apm;
+            const pps = (jsonTL.data.pps === null) ? 0: jsonTL.data.pps;
+            const vs = (jsonTL.data.vs === null) ? 0: jsonTL.data.vs;
+            const tr = (jsonTL.data.tr === -1) ? 'None' : Math.round(jsonTL.data.tr).toLocaleString('en-US');
+            const rank = (jsonTL.data.rank === 'z') ? 'None' : jsonTL.data.rank.toUpperCase();
+
             // Final embed
             const embed = new EmbedBuilder()
                     .setColor('Green')
@@ -112,9 +127,6 @@ module.exports = {
                         { name: 'EXP gained', value: `${exp}`, inline: true },
                         { name: 'AR', value: `${ar}`, inline: true },
                         { name: 'Game time', value: `${gameTime} hours`, inline: true },
-                        { name: 'Games played', value: `${gamesPlayed}`, inline: true },
-                        { name: 'Games won', value: `${gamesWon}`, inline: true },
-                        { name: 'Win rate', value: `${winRate}%`, inline: true },
                         { name: '40L PB', value: `${fortylineTime} secs`, inline: true },
                         { name: 'Blitz PB', value: `${blitzScore}`, inline: true },
                         { name: '\u200b', value: '\u200b', inline: true},
@@ -123,6 +135,15 @@ module.exports = {
                         { name: '\u200b', value: '\u200b', inline: true},
                         { name: 'Expert QP All Time', value: `${expertqpAlltime}m`, inline: true },
                         { name: 'Expert QP This Week', value: `${expertqpWeek}m`, inline: true },
+                        { name: '\u200b', value: '\u200b', inline: true},
+                        { name: 'Games played', value: `${gamesPlayed}`, inline: true },
+                        { name: 'Games won', value: `${gamesWon}`, inline: true },
+                        { name: 'Win rate', value: `${winRate}%`, inline: true },
+                        { name: 'APM', value: `${apm}`, inline: true },
+                        { name: 'PPS', value: `${pps}`, inline: true },
+                        { name: 'VS', value: `${vs}`, inline: true },
+                        { name: 'TR', value: `${tr}`, inline: true },
+                        { name: 'Rank', value: `${rank}`, inline: true },
                         { name: '\u200b', value: '\u200b', inline: true},
                     );
 
