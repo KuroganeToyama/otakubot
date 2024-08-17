@@ -71,12 +71,12 @@ module.exports = {
                         .setColor('Green')
                         .setTitle(`TETRIO profile of ${tetrioUser.toUpperCase()}`)
                         .addFields(
-                            { name: 'EXP gained', value: `${exp}`, inline: false },
-                            { name: 'Number of games played', value: `${gamesPlayed}`, inline: false },
-                            { name: 'Number of games won', value: `${gamesWon}`, inline: false },
-                            { name: 'Win rate', value: `${winRate}%`, inline: false },
-                            { name: 'AR', value: `${ar}`, inline: false },
-                            { name: 'Game time', value: `${gameTime} hours`, inline: false },
+                            { name: 'EXP gained', value: `${exp}`, inline: true },
+                            { name: 'AR', value: `${ar}`, inline: true },
+                            { name: 'Game time', value: `${gameTime} hours`, inline: true },
+                            { name: 'Games played', value: `${gamesPlayed}`, inline: true },
+                            { name: 'Games won', value: `${gamesWon}`, inline: true },
+                            { name: 'Win rate', value: `${winRate}%`, inline: true },
                         );
 
                 await interaction.editReply({embeds: [embed]});
