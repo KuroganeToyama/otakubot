@@ -1,15 +1,9 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const QuickChart = require('quickchart-js');
+const discordToTETRIO = require('../../tetrio.json');
 
 const tetrioAPI = 'https://ch.tetr.io/api/';
 const userEndpoint = 'users/';
-
-const discordToTETRIO = {
-    'toyama21': 'toyama',
-    'lasertaserlt': 'or1ental',
-    'markhermy_dna3100': 'noob_neutral',
-    'newbie5882': 'spinning_newbie',
-};
 
 module.exports = {
     data: new SlashCommandBuilder()
