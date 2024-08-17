@@ -7,6 +7,7 @@ const userEndpoint = 'users/';
 const summaryEndpoint = 'summaries/';
 const fortylineEndpoint = '40l';
 const blitzEndpoint = 'blitz';
+const quickplayEndpoint = 'zenith';
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -86,6 +87,14 @@ module.exports = {
             const finalScore = jsonBlitz.data.record.results.stats.score;
             const blitzScore = finalScore.toLocaleString('en-US');
 
+            // Quick Play data
+            const apiCallQP = apiCallUser + '/' + summaryEndpoint + quickplayEndpoint;
+            const responseQP = await fetch(apiCallQP);
+            const jsonQP = await responseQP.json();
+
+            const quickplayAlltime = jsonQP.data.best.record.results.stats.zenith.altitude.toFixed(1);
+            const quickplayWeek = (jsonQP.data.record === null) ? 0 : jsonQP.data.record.results.stats.zenith.altitude.toFixed(1);
+
             // Final embed
             const embed = new EmbedBuilder()
                     .setColor('Green')
@@ -99,6 +108,10 @@ module.exports = {
                         { name: 'Win rate', value: `${winRate}%`, inline: true },
                         { name: '40L PB', value: `${fortylineTime} secs`, inline: true },
                         { name: 'Blitz PB', value: `${blitzScore}`, inline: true },
+                        { name: '\u200b', value: '\u200b', inline: true},
+                        { name: 'All Time QP', value: `${quickplayAlltime}m`, inline: true },
+                        { name: 'This Week QP', value: `${quickplayWeek}m`, inline: true },
+                        { name: '\u200b', value: '\u200b', inline: true},
                     );
 
             await interaction.editReply({embeds: [embed]});
