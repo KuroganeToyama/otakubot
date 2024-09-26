@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -28,8 +28,17 @@ module.exports = {
             const apiCall = `https://di-nguyen-pixiv-api.onrender.com/image?tag=${tag}`;
             const response = await fetch(apiCall);
             const json = await response.json();
-            
-            await interaction.editReply(json.url);
+
+            if (json.url) {
+                await interaction.editReply(json.url);
+            }
+            else if (json.error) {
+                const embed = new EmbedBuilder()
+                    .setTitle('ERROR')
+                    .setColor('Red')
+                    .setDescription(json.error)
+                await interaction.editReply({embeds: [embed]});
+            }
             return;
         }
 
